@@ -3,4 +3,10 @@ import app from "../src/app";
 
 const api = supertest(app);
 
-describe()
+describe("GET /health", () => {
+    it("it should return status 200 and a message", async () =>{
+        const { status, text } = await api.get("/health");
+        expect(status).toBe(200);
+        expect(text).toBe(`I'm okay!`);
+    })
+})
