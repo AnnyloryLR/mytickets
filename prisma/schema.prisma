@@ -29,7 +29,7 @@ model Ticket {
   used  Boolean @default(false)
 
   Event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  eventId Int
+  eventId Int 
 
   @@unique([eventId, code])
   @@map("tickets")
