@@ -19,7 +19,7 @@ export async function createEvents(numberOfEvents: number){
         data:
             eventsData.map(e => { return {
                 name: e.name,
-                date:e.date
+                date:e.date,
             }})
     })
 }

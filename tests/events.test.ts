@@ -1,14 +1,19 @@
 import supertest from "supertest";
 import app from "../src/app";
+import prisma from "../src/database";
 import { createEvents } from "./factories/events-factory";
-
 
 const api = supertest(app);
 
+beforeEach(async () => {
+    await prisma.event.deleteMany();
+})
+
 describe("GET /events", () => {
-    it("should return all events or a empty list in case there's none",
+    it("should return all events",
         async () => {
         await createEvents(3);
+
 
         const { status, body } = await api.get("/events");
 
@@ -28,9 +33,9 @@ describe("GET /events", () => {
     })
 })
 
-describe("GET /events/:id", () => {
-    it("should return a specific event giving an id", async () => {
-        
-})
+// describe("GET /events/:id", () => {
+//     it("should return a specific event giving an id", async () => {
 
-})
+// })
+
+// })
