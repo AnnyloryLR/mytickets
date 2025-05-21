@@ -52,7 +52,7 @@ describe("GET /events/:id", () => {
 })
 
 describe("POST /events", () => {
-    it("should create a contact and return the status 201", async () => {
+    it("should create a event and return the status 201", async () => {
         const data = generateEventBody();
 
         const { status } = await api.post("/events").send(data);
@@ -64,6 +64,58 @@ describe("POST /events", () => {
         });
 
         expect(existentEvent).not.toBeNull();
+
+    })
+})
+
+describe("PUT /events/:id", () => {
+    it("should update a event given an id and return the status 204",
+        async () => { 
+            const data = await prisma.event.create({
+                data:{        
+                    name: "driven",
+                    date: new Date("2025-07-11")
+                }
+            });
+
+            const {id} = data;
+          
+            const update = { 
+                name: "driven",
+                date: new Date("2025-09-11")
+
+            }
+
+            const { status } = await api.put(`/events/${id}`).send(update);
+
+            expect(status).toBe(200);
+
+            const updated = await prisma.event.findUnique({
+                where: { name: update.name }
+            });
+
+            expect(updated).not.toBeNull();
+
+        })
+})
+
+describe("DELETE /events/:id", () => {
+    it("should update a event given an id and return the status 204",
+        async () => {
+            const data = await createEvents(3);
+             console.log(data)
+
+            const id = data[0].id;        
+
+            const { status } = await api.delete(`/events/${id}`);
+
+            expect(status).toBe(204);
+
+            const deleted = await prisma.event.findUnique({
+                where: { name: data[0].name }
+            });
+
+            expect(deleted).toBeNull();
 
     })
 })

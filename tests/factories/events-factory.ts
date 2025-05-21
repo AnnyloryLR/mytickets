@@ -8,7 +8,7 @@ export function generateEventBody(){
     }
 }
 
-function generateEvents(numberOfEvents:number){
+export function generateEvents(numberOfEvents:number){
     const events = [];
 
     for(let i=0; i < numberOfEvents; i++){
@@ -22,11 +22,13 @@ function generateEvents(numberOfEvents:number){
 export async function createEvents(numberOfEvents: number){
     const eventsData = generateEvents(numberOfEvents);
 
-    await prisma.event.createMany({
+    const events = await prisma.event.createManyAndReturn({
         data:
             eventsData.map(e => { return {
                 name: e.name,
                 date:e.date,
             }})
     })
+
+    return events;
 }
