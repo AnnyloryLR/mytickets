@@ -2,6 +2,7 @@ import supertest from "supertest";
 import app from "../src/app";
 import prisma from "../src/database";
 import { createEvents } from "./factories/events-factory";
+import { getEventId } from "./factories/tickets-factory";
 
 const api = supertest(app);
 
@@ -18,7 +19,6 @@ describe("GET /events", () => {
         const { status, body } = await api.get("/events");
 
         expect(status).toBe(200);
-
         expect(body).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
@@ -35,7 +35,18 @@ describe("GET /events", () => {
 
 describe("GET /events/:id", () => {
     it("should return a specific event giving an id", async () => {
+        await createEvents(3);
+        const id = await getEventId();
+        
+        const { status, body } = await api.get(`/events/${id}`)
 
-})
-
+        expect(status).toBe(200);
+        expect(body).toEqual(
+            expect.objectContaining({
+                    id:expect.any(Number),
+                    name:expect.any(String),
+                    date:expect.any(String)
+                })
+        )   
+    })
 })
