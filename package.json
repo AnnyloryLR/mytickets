@@ -8,7 +8,7 @@
     "start": "npm run migration:run && node dist/src/server.js",
     "dev": "ts-node-dev src/server.ts",
     "migration:run": "prisma migrate deploy",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "keywords": [],
   "author": "",

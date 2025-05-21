@@ -1,14 +1,25 @@
 import supertest from "supertest";
 import app from "../src/app";
+import prisma from "../src/database";
 import { createPurchases } from "./factories/tickets-factory";
 
 const api = supertest(app);
 
+async function getEventId(){
+    const events = await prisma.event.findMany();
+
+    const id = events[0].id;
+
+    return id
+}
+
 describe("GET /tickets/:eventId", () => {
     it("should return all tickets given an eventId", async () => {
-        await createPurchases();
+       const id = await getEventId()
 
-        const { status, body } = await api.get("/tickets/30");
+       await createPurchases();
+
+        const { status, body } = await api.get(`/tickets/${id}`);
 
         expect(status).toBe(200);
 

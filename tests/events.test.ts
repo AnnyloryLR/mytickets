@@ -33,9 +33,9 @@ describe("GET /events", () => {
     })
 })
 
-// describe("GET /events/:id", () => {
-//     it("should return a specific event giving an id", async () => {
+describe("GET /events/:id", () => {
+    it("should return a specific event giving an id", async () => {
 
-// })
+})
 
-// })
+})
