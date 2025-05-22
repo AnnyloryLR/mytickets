@@ -2,7 +2,7 @@ import supertest from "supertest";
 import app from "../src/app";
 import prisma from  "../src/database";
 import { faker } from "@faker-js/faker";
-import { createPurchases, getEventId } from "./factories/tickets-factory";
+import { createPurchases } from "./factories/tickets-factory";
 import { createEvents } from "./factories/events-factory";
 
 const api = supertest(app);
@@ -13,12 +13,13 @@ beforeEach(async () => {
 
 describe("GET /tickets/:eventId", () => {
     it("should return all tickets given an eventId", async () => {
-        await createEvents(3);
-        const id = await getEventId();
+        
+        const events = await createEvents(3);
+        const eventId = events[0].id
 
         await createPurchases();
 
-        const { status, body } = await api.get(`/tickets/${id}`);
+        const { status, body } = await api.get(`/tickets/${eventId}`);
 
         expect(status).toBe(200);
 
@@ -38,14 +39,14 @@ describe("GET /tickets/:eventId", () => {
 
 describe("POST /tickets", () => {
     it("should create a ticket purchase and return status 201", async () => {
-        await createEvents(3);
-
-        const eventId = await getEventId();
+        
+        const events = await createEvents(3);
+        const eventId = events[0].id
 
         const data = {
             code:faker.string.alphanumeric(5),
             owner:faker.person.firstName(),
-            eventId
+            eventId:eventId
         }
 
         const { status, body } = await api.post("/tickets").send(data);
@@ -62,19 +63,19 @@ describe("POST /tickets", () => {
 })
 
 describe("PUT /tickets/use/:id", () => {
-    it("should update a ticket purchase to used and return status 204", async () => {
-        await createEvents(3);
-
-        const eventId = await getEventId();
+    it("should update a ticket purchase to used and return status 204", async () => {       
+        
+        const events = await createEvents(3);
+        const eventId = events[0].id
 
         const data = await prisma.ticket.create({
             data:{
                 code:faker.string.alphanumeric(5),
                 owner:faker.person.firstName(),
-                eventId
+                eventId: eventId
            }
         })
-
+  
         const id = data.id
        
         const { status } = await api.put(`/tickets/use/${id}`);

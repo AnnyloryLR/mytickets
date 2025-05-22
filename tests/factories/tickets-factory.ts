@@ -1,14 +1,6 @@
 import prisma from "../../src/database";
 import { faker } from "@faker-js/faker";
 
-export async function getEventId(){
-    const events = await prisma.event.findMany();
-
-    const id = events[0].id;
-
-    return id
-}
-
 export async function generateTicketsData(){
     const ticketsPurchases = [];
 
