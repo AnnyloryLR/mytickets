@@ -29,15 +29,13 @@ describe("GET /events", () => {
         
         
     })
-})
 
-describe("GET /events/:id", () => {
     it("should return a specific event giving an id", async () => {
         
         const result = await createEvents(3);
         const id = result[0].id
         
-        const { status, body } = await api.get(`/events/${id}`)
+        const { status, body } = await api.get(`/events/${id}`);
 
         expect(status).toBe(200);
         expect(body).toEqual(
@@ -47,6 +45,13 @@ describe("GET /events/:id", () => {
                     date:expect.any(String)
                 })
         )   
+    })
+
+    it("should return a message and the status 404", async ()=> {
+        const { status, text } = await api.get(`/events/1`);
+
+        expect(status).toBe(404);
+        expect(text).toBe("Event with id 1 not found.")
     })
 })
 
@@ -63,6 +68,18 @@ describe("POST /events", () => {
         });
 
         expect(existentEvent).not.toBeNull();
+
+    })
+
+    it("should return a message and the status 409", async () => {
+        const data = generateEventBody();
+
+        await api.post("/events").send(data);
+
+        const { status, text } = await api.post("/events").send(data);
+
+        expect(status).toBe(409);
+        expect(text).toBe(`Event with name ${data.name} already registered.`)
 
     })
 })
@@ -102,7 +119,6 @@ describe("DELETE /events/:id", () => {
     it("should update a event given an id and return the status 204",
         async () => {
             const data = await createEvents(3);
-             console.log(data)
 
             const id = data[0].id;        
 
@@ -118,3 +134,4 @@ describe("DELETE /events/:id", () => {
 
     })
 })
+
