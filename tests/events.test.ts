@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import app from "../src/app";
 import prisma from "../src/database";
+import { faker } from "@faker-js/faker"
 import { createEvents, generateEventBody } from "./factories/events-factory";
 
 const api = supertest(app);
@@ -48,10 +49,23 @@ describe("GET /events", () => {
     })
 
     it("should return a message and the status 404", async ()=> {
-        const { status, text } = await api.get(`/events/1`);
+        const result = await prisma.event.create({
+            data:{
+                name:faker.company.name(),
+                date:faker.date.future()
+            }
+        });
+
+        const id = result.id;
+
+        await prisma.event.delete({
+            where:{id:id}
+        });
+
+        const { status, text } = await api.get(`/events/${id}`);
 
         expect(status).toBe(404);
-        expect(text).toBe("Event with id 1 not found.")
+        expect(text).toBe(`Event with id ${id} not found.`)
     })
 })
 
@@ -112,7 +126,35 @@ describe("PUT /events/:id", () => {
 
             expect(updated).not.toBeNull();
 
-        })
+    })
+
+    it("should return a message and the status 404", async ()=> {
+        
+        const data = await prisma.event.create({
+                data:{        
+                    name: "FLIP",
+                    date: new Date("2025-07-11")
+                }
+            });
+
+        const id = data.id;
+
+        await prisma.event.delete({
+            where:{id:id}
+        });
+
+        const update = { 
+                name: "FLIP",
+                date: new Date("2025-09-11")
+
+        }
+
+        const { status, text } = await api.put(`/events/${id}`).send(update);
+
+        expect(status).toBe(404);
+        expect(text).toBe(`Event with id ${id} not found.`)
+    })
+       
 })
 
 describe("DELETE /events/:id", () => {

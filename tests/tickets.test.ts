@@ -60,6 +60,56 @@ describe("POST /tickets", () => {
         expect(existentTicket).not.toBeNull();
 
     })
+
+    it("should return the status 403 and a message", async () => {
+
+        const result = await prisma.event.create({
+            data:{
+                name:faker.company.name(),
+                date:faker.date.past()
+            }
+        });
+
+        const ticketData = {
+            code:faker.string.alphanumeric(5),
+            owner:faker.person.firstName(),
+            eventId:result.id
+        }
+
+        const { status, text } = await api.post("/tickets").send(ticketData);
+
+        expect(status).toBe(403);
+
+        expect(text).toBe(`The event has already happened.`);      
+    })
+
+    it("should return a message and the status 409", async () => {
+        const result = await prisma.event.create({
+            data:{
+                name:faker.company.name(),
+                date:faker.date.future()
+            }
+        });
+
+        const ticketData = await prisma.ticket.create({
+            data: {
+                code:faker.string.alphanumeric(5),
+                owner:faker.person.firstName(),
+                eventId:result.id
+            }
+        });
+
+        const ticketDataConflict = {
+            code: ticketData.code,
+            owner: ticketData.owner,
+            eventId:result.id
+        }
+
+        const { status, text } = await api.post("/tickets").send(ticketDataConflict);
+
+        expect(status).toBe(409);
+        expect(text).toBe(`Ticket with code ${ticketData.code} for event id ${result.id} already registered.`)
+    })
 })
 
 describe("PUT /tickets/use/:id", () => {
@@ -88,5 +138,27 @@ describe("PUT /tickets/use/:id", () => {
 
         expect(updated).not.toBeNull();
 
+    })
+
+    it("should return a message and the status 403", async () => {
+        const events = await createEvents(3);
+        const eventId = events[0].id
+
+        const data = await prisma.ticket.create({
+            data:{
+                code:faker.string.alphanumeric(5),
+                owner:faker.person.firstName(),
+                eventId: eventId
+           }
+        });
+  
+        const id = data.id
+       
+        await api.put(`/tickets/use/${id}`);
+
+        const { status, text } = await api.put(`/tickets/use/${id}`);
+
+        expect(status).toBe(403);
+        expect(text).toBe(`The event has already happened or ticket was already used.`)
     })
 })
