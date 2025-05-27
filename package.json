@@ -8,10 +8,10 @@
     "start": "npm run migration:run && node dist/src/server.js",
     "dev": "ts-node-dev src/server.ts",
     "migration:run": "prisma migrate deploy",
-    "test:loads-env": "dotenv -e .env.test",
-    "test": "npm run test:loads-env -- jest --runInBand",
-    "test:coverage": "npm run test:loads-env -- jest -- --coverage --runInBand",
-    "test:migration:run": "npm run test:loads-env prisma migrate deploy"
+    "test:load-envs": "dotenv -e .env.test",
+    "test": "npm run test:load-envs -- jest --runInBand",
+    "test:coverage": "npm run test:load-envs -- jest -- --coverage --runInBand",
+    "test:migration:run": "npm run test:load-envs prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
